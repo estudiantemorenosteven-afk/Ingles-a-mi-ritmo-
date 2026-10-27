@@ -1,0 +1,848 @@
+/* DISEÑO DEL OVA
+   Las clases del HTML se seleccionan con un punto.
+   Los identificadores se seleccionan con #.
+   Las reglas @media adaptan el diseño a pantallas más pequeñas.
+*/
+
+:root {
+    --ink: #203831;
+    --green: #245c46;
+    --lime: #dfedbb;
+    --paper: #f7f8f3;
+    --muted: #64756b;
+}
+* {
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font:
+        16px/1.6 system-ui,
+        sans-serif;
+}
+button,
+a,
+input,
+textarea {
+    font: inherit;
+}
+button,
+a {
+    touch-action: manipulation;
+}
+button {
+    cursor: pointer;
+    border: 1px solid #cbd5c8;
+    background: white;
+    color: var(--ink);
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-weight: 600;
+}
+button:hover {
+    background: #edf2e4;
+}
+button:disabled {
+    cursor: default;
+    opacity: 0.65;
+}
+a {
+    color: var(--green);
+}
+:focus-visible {
+    outline: 3px solid #9a5b12;
+    outline-offset: 4px;
+}
+.skip {
+    position: absolute;
+    top: -100px;
+}
+.skip:focus {
+    top: 0;
+    z-index: 10;
+    background: white;
+}
+aside {
+    width: 244px;
+    position: fixed;
+    inset: 0 auto 0 0;
+    background: #eef1e7;
+    padding: 34px 26px;
+    border-right: 1px solid #dde3d5;
+    display: flex;
+    flex-direction: column;
+}
+.brand {
+    text-decoration: none;
+    font-size: 23px;
+    line-height: 1.1;
+    font-weight: 750;
+    display: block;
+    margin-bottom: 56px;
+}
+.brand small {
+    font-size: 17px;
+    font-weight: 400;
+}
+.logo {
+    float: left;
+    background: var(--green);
+    color: white;
+    border-radius: 15px;
+    width: 48px;
+    height: 48px;
+    text-align: center;
+    line-height: 45px;
+    margin-right: 10px;
+    font-size: 32px;
+}
+.eyebrow {
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+}
+nav a {
+    display: block;
+    text-decoration: none;
+    color: #526359;
+    padding: 12px 14px;
+    margin: 5px -4px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+nav a.active {
+    background: var(--green);
+    color: white;
+}
+nav a b {
+    margin-right: 12px;
+    font-weight: 500;
+    opacity: 0.65;
+}
+.aside-bottom {
+    margin-top: auto;
+    color: var(--muted);
+    font-size: 14px;
+}
+.aside-bottom p {
+    color: var(--ink);
+    margin-bottom: 0;
+}
+.mini-line {
+    height: 1px;
+    background: #ccd5c5;
+    margin: 25px 0;
+}
+.page {
+    margin-left: 244px;
+}
+header {
+    padding: 22px 42px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e1e5da;
+    font-size: 11px;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+header button {
+    padding: 6px 13px;
+    font-size: 13px;
+    margin-left: 8px;
+}
+.muted {
+    color: var(--muted);
+}
+main {
+    max-width: 1170px;
+    margin: auto;
+    padding: 38px 46px 60px;
+    min-height: 80vh;
+}
+h1 {
+    font-size: clamp(34px, 4.3vw, 60px);
+    line-height: 1.1;
+    letter-spacing: -2px;
+    margin: 20px 0;
+}
+h1 em {
+    font-family: Georgia, serif;
+    font-weight: 400;
+    color: var(--green);
+}
+h2 {
+    font-size: 25px;
+    line-height: 1.25;
+    letter-spacing: -0.5px;
+}
+h3 {
+    font-size: 19px;
+}
+.lead {
+    color: #5f7066;
+    max-width: 560px;
+    font-size: 17px;
+}
+.badge {
+    display: inline-block;
+    padding: 5px 12px;
+    background: #e8eddd;
+    border-radius: 25px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+}
+.hero {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 32px;
+    align-items: center;
+}
+.primary {
+    background: var(--green);
+    border-color: var(--green);
+    color: white;
+}
+.primary:hover {
+    background: #183f30;
+}
+.actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+}
+.hero-art {
+    background: #e4ebd7;
+    border-radius: 28px;
+    min-height: 330px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.hero-art svg {
+    width: 92%;
+    height: 310px;
+}
+.art-label {
+    position: absolute;
+    bottom: 19px;
+    left: 20px;
+    background: white;
+    padding: 9px 14px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+.stats {
+    display: flex;
+    gap: 25px;
+    margin: 30px 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+.stats strong {
+    display: block;
+    color: var(--ink);
+    font-size: 15px;
+}
+.section-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 30px 0 16px;
+}
+.section-line h2 {
+    margin: 0;
+}
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+.card {
+    background: white;
+    border: 1px solid #dfe5d8;
+    border-radius: 18px;
+    padding: 24px;
+}
+.card p {
+    font-size: 14px;
+    color: #627166;
+}
+.card .num {
+    background: #edf2e5;
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 9px;
+    color: var(--green);
+    font-size: 13px;
+}
+.card button {
+    margin-top: 12px;
+    width: 100%;
+    text-align: left;
+}
+.card h3 {
+    margin-bottom: 6px;
+}
+.progress-track {
+    height: 6px;
+    border-radius: 8px;
+    background: #e1e7d8;
+    overflow: hidden;
+    margin: 14px 0;
+}
+.progress-track div {
+    height: 100%;
+    background: var(--green);
+}
+.panel {
+    background: white;
+    border: 1px solid #dde4d6;
+    padding: 30px;
+    border-radius: 20px;
+    margin: 22px 0;
+}
+.reading {
+    font-size: 20px;
+    line-height: 1.9;
+    max-width: 800px;
+}
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.chip {
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: #edf1e6;
+    font-size: 13px;
+}
+.options {
+    display: grid;
+    gap: 12px;
+    margin: 24px 0;
+}
+.option {
+    text-align: left;
+    padding: 16px 20px;
+}
+.correct {
+    border-color: #327455;
+    background: #eaf5e9;
+}
+.wrong {
+    border-color: #a16834;
+    background: #fff4e8;
+}
+.feedback {
+    padding: 16px;
+    background: #f0f4e8;
+    border-radius: 10px;
+    margin-top: 16px;
+}
+.feedback:empty {
+    display: none;
+}
+label {
+    display: block;
+    font-weight: 650;
+    margin: 14px 0 6px;
+}
+textarea {
+    width: 100%;
+    min-height: 140px;
+    border: 1px solid #aebbab;
+    border-radius: 12px;
+    padding: 15px;
+    color: var(--ink);
+    background: #fff;
+}
+details {
+    margin: 20px 0;
+}
+summary {
+    cursor: pointer;
+    font-weight: 600;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 14px;
+}
+th,
+td {
+    padding: 14px;
+    border-bottom: 1px solid #dde3d7;
+    text-align: left;
+    vertical-align: top;
+}
+footer {
+    padding: 20px 46px;
+    border-top: 1px solid #e1e5da;
+    font-size: 11px;
+    color: var(--muted);
+}
+footer span {
+    float: right;
+}
+dialog {
+    max-width: 460px;
+    border: 1px solid #cbd7be;
+    border-radius: 20px;
+    padding: 32px;
+}
+dialog::backdrop {
+    background: #19392d88;
+}
+.large {
+    font-size: 19px;
+}
+.large main p,
+.large button {
+    font-size: 1.08em;
+}
+.notice {
+    font-size: 13px;
+    color: var(--muted);
+}
+@media (max-width: 950px) {
+    aside {
+        width: 196px;
+        padding: 25px 16px;
+    }
+    .page {
+        margin-left: 196px;
+    }
+    main {
+        padding: 25px;
+    }
+    .hero {
+        grid-template-columns: 1fr;
+    }
+    .hero-art {
+        min-height: 230px;
+    }
+    .hero-art svg {
+        height: 230px;
+    }
+    .grid {
+        grid-template-columns: 1fr;
+    }
+    header {
+        padding: 16px 25px;
+    }
+}
+@media (max-width: 600px) {
+    aside {
+        position: static;
+        width: auto;
+        padding: 18px;
+    }
+    .brand {
+        margin-bottom: 10px;
+        font-size: 20px;
+    }
+    .brand small {
+        font-size: 14px;
+    }
+    aside > .eyebrow,
+    .aside-bottom {
+        display: none;
+    }
+    nav {
+        display: flex;
+        overflow: auto;
+    }
+    nav a {
+        white-space: nowrap;
+        font-size: 12px;
+        padding: 9px;
+    }
+    nav a b {
+        display: none;
+    }
+    .page {
+        margin: 0;
+    }
+    header {
+        padding: 12px 18px;
+        font-size: 9px;
+    }
+    main {
+        padding: 22px 18px;
+    }
+    h1 {
+        font-size: 40px;
+    }
+    .panel {
+        padding: 20px;
+    }
+    .stats {
+        gap: 15px;
+    }
+    footer {
+        padding: 18px;
+    }
+    footer span {
+        display: none;
+    }
+    .hero-art {
+        min-height: 200px;
+    }
+    table {
+        font-size: 12px;
+    }
+    th,
+    td {
+        padding: 8px;
+    }
+}
+
+/* ADAPTACIÓN A COMPUTADORES, TABLETAS Y CELULARES */
+/* min-width: 0 permite que los elementos se reduzcan sin salir de la pantalla. */
+.page,
+main,
+.hero > div,
+.grid > article,
+.panel {
+    min-width: 0;
+}
+
+body {
+    overflow-wrap: break-word;
+}
+
+button {
+    min-height: 44px;
+    white-space: normal;
+}
+
+button,
+textarea {
+    max-width: 100%;
+}
+
+textarea {
+    font-size: 16px;
+}
+
+img,
+svg {
+    max-width: 100%;
+}
+
+header > div {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 8px;
+}
+
+header button {
+    margin-left: 0;
+}
+
+.reading,
+.panel p,
+.feedback,
+.option {
+    overflow-wrap: anywhere;
+}
+
+.section-line {
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.stats {
+    flex-wrap: wrap;
+}
+
+/* La ventana de pausa también debe caber en un teléfono pequeño. */
+dialog {
+    width: min(460px, calc(100% - 32px));
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+}
+
+/* Tabletas: dos tarjetas por fila y menú en la parte superior. */
+@media (max-width: 1000px) {
+    aside {
+        position: static;
+        width: 100%;
+        padding: 18px 24px;
+    }
+
+    .brand {
+        margin-bottom: 12px;
+    }
+
+    aside > .eyebrow,
+    .aside-bottom {
+        display: none;
+    }
+
+    .page {
+        margin-left: 0;
+    }
+
+    nav {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        overflow: visible;
+    }
+
+    nav a {
+        display: flex;
+        align-items: center;
+        min-height: 44px;
+        margin: 0;
+        padding: 10px 12px;
+        white-space: normal;
+        font-size: 14px;
+        background: #e4eadd;
+    }
+
+    nav a b {
+        display: none;
+    }
+
+    .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .hero {
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+        gap: 24px;
+    }
+}
+
+/* Celulares: una columna, botones táctiles y navegación siempre visible. */
+@media (max-width: 650px) {
+    aside {
+        padding: 16px;
+    }
+
+    nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    nav a {
+        font-size: 13px;
+        padding: 10px;
+    }
+
+    header {
+        padding: 12px 16px;
+        gap: 12px;
+        flex-wrap: wrap;
+        letter-spacing: 0.5px;
+    }
+
+    header > span {
+        font-size: 10px;
+    }
+
+    main {
+        padding: 26px 16px 40px;
+    }
+
+    h1 {
+        font-size: clamp(32px, 9vw, 44px);
+        letter-spacing: -1px;
+    }
+
+    .hero,
+    .grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hero-art {
+        min-height: 200px;
+    }
+
+    .hero-art svg {
+        height: 220px;
+    }
+
+    .badge {
+        max-width: 100%;
+        white-space: normal;
+    }
+
+    .panel,
+    .card {
+        padding: 20px;
+    }
+
+    .reading {
+        font-size: 18px;
+        line-height: 1.8;
+    }
+
+    .actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .actions button {
+        width: 100%;
+    }
+
+    .option {
+        padding: 15px;
+    }
+
+    .stats {
+        gap: 14px;
+    }
+
+    footer {
+        padding: 18px 16px;
+    }
+
+    footer span {
+        display: block;
+        float: none;
+        margin-top: 8px;
+    }
+
+    /* La matriz curricular se convierte en fichas en pantallas pequeñas. */
+    table,
+    tbody,
+    tr,
+    td {
+        display: block;
+        width: 100%;
+    }
+
+    thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+    }
+
+    tr {
+        margin-bottom: 18px;
+        border: 1px solid #dde3d7;
+        border-radius: 10px;
+    }
+
+    td {
+        padding: 12px;
+        font-size: 14px;
+        overflow-wrap: anywhere;
+    }
+
+    td::before {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    td:nth-child(1)::before {
+        content: "Misión";
+    }
+
+    td:nth-child(2)::before {
+        content: "Desempeño de referencia";
+    }
+
+    td:nth-child(3)::before {
+        content: "Evidencia en el OVA";
+    }
+
+    td:last-child {
+        border-bottom: 0;
+    }
+}
+
+/* Respeta la preferencia de las personas que reducen movimientos. */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        scroll-behavior: auto;
+    }
+}
+
+/* Elección inicial del grado y videos adaptables. */
+.choosing-grade aside {
+    display: none;
+}
+.choosing-grade .page {
+    margin-left: 0;
+}
+.grade-welcome {
+    max-width: 940px;
+    margin: 20px auto;
+}
+.grade-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    margin: 30px 0;
+}
+.grade-card {
+    padding: 30px;
+}
+.grade-number {
+    display: inline-block;
+    font:
+        600 45px/1.3 Georgia,
+        serif;
+    color: var(--green);
+}
+.grade-card ul {
+    padding-left: 20px;
+    font-size: 15px;
+    min-height: 110px;
+}
+.grade-card button {
+    width: 100%;
+}
+.video-frame {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #182a23;
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 18px 0;
+}
+.video-frame iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+header {
+    gap: 14px;
+    flex-wrap: wrap;
+}
+header > div {
+    flex-wrap: wrap;
+    flex-shrink: 1;
+}
+@media (max-width: 650px) {
+    .grade-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .grade-card {
+        padding: 22px;
+    }
+    .grade-card ul {
+        min-height: auto;
+    }
+    .grade-welcome h1 {
+        font-size: 36px;
+    }
+}

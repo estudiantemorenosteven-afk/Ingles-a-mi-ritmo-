@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="es">
+    <!-- Configuración, título y archivos que utiliza la página. -->
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta
+            name="description"
+            content="Practica inglés a tu ritmo. OVA de vida escolar para sexto y séptimo."
+        />
+        <title>Ingles a mi ritmo · OVA</title>
+        <link rel="stylesheet" href="styles.css" />
+        <script src="contenido.js" defer></script>
+        <script src="app.js" defer></script>
+    </head>
+    <body>
+        <a class="skip" href="#main">Saltar al contenido</a
+        ><!-- Menú lateral del OVA. -->
+        <aside>
+            <a class="brand" href="#inicio"
+                ><span class="logo">i.</span>Ingles<br /><small>a mi ritmo</small></a
+            >
+            <p class="eyebrow">MI ESPACIO DE APRENDIZAJE</p>
+            <nav id="nav" aria-label="Secciones"></nav>
+            <div class="aside-bottom">
+                <p>Un paso a la vez.</p>
+                <small>Tu ritmo también cuenta.</small>
+                <div class="mini-line"></div>
+                <small>6.º y 7.º · Inglés</small>
+            </div>
+        </aside>
+        <div class="page">
+            <header>
+                <span>ALBERTO LLERAS CAMARGO <span class="muted">/ OVA</span></span>
+                <div>
+                    <button id="gradeSwitch">Elegir grado</button>
+                    <button
+                        id="size"
+                        aria-label="Aumentar o restablecer tamaño de texto"
+                    >
+                        Aa</button
+                    ><button id="pause">Pausa</button>
+                </div>
+            </header>
+            <!-- JavaScript coloca las diferentes pantallas dentro de main. -->
+            <main id="main" tabindex="-1"></main>
+            <footer>
+                Ingles a mi ritmo · Primera versión educativa
+                <span>Aprende · Practica · Conecta</span>
+            </footer>
+        </div>
+        <!-- Ventana de descanso. -->
+        <dialog id="pauseDialog">
+            <p class="eyebrow">UN MOMENTO PARA TI</p>
+            <h2>Haz una pausa</h2>
+            <p>
+                Puedes estirarte, descansar la mirada o respirar a tu ritmo. Vuelve
+                cuando quieras.
+            </p>
+            <button id="resume" class="primary">Continuar aprendiendo</button>
+        </dialog>
+    </body>
+</html>
