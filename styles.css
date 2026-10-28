@@ -5,11 +5,11 @@
 */
 
 :root {
-    --ink: #203831;
-    --green: #245c46;
-    --lime: #dfedbb;
-    --paper: #f7f8f3;
-    --muted: #64756b;
+    --ink: #18324b;
+    --green: #2457a7;
+    --lime: #eee8fa;
+    --paper: #f7f8f4;
+    --muted: #526376;
 }
 * {
     box-sizing: border-box;
@@ -42,7 +42,7 @@ button {
     font-weight: 600;
 }
 button:hover {
-    background: #edf2e4;
+    background: #edf2fb;
 }
 button:disabled {
     cursor: default;
@@ -68,9 +68,9 @@ aside {
     width: 244px;
     position: fixed;
     inset: 0 auto 0 0;
-    background: #eef1e7;
+    background: #edf1f8;
     padding: 34px 26px;
-    border-right: 1px solid #dde3d5;
+    border-right: 1px solid #d5deeb;
     display: flex;
     flex-direction: column;
 }
@@ -107,7 +107,7 @@ aside {
 nav a {
     display: block;
     text-decoration: none;
-    color: #526359;
+    color: #526376;
     padding: 12px 14px;
     margin: 5px -4px;
     border-radius: 10px;
@@ -183,14 +183,14 @@ h3 {
     font-size: 19px;
 }
 .lead {
-    color: #5f7066;
+    color: #526376;
     max-width: 560px;
     font-size: 17px;
 }
 .badge {
     display: inline-block;
     padding: 5px 12px;
-    background: #e8eddd;
+    background: #eee8fa;
     border-radius: 25px;
     font-size: 11px;
     font-weight: 700;
@@ -208,7 +208,7 @@ h3 {
     color: white;
 }
 .primary:hover {
-    background: #183f30;
+    background: #193f7e;
 }
 .actions {
     display: flex;
@@ -217,7 +217,7 @@ h3 {
     margin-top: 24px;
 }
 .hero-art {
-    background: #e4ebd7;
+    background: #eee8fa;
     border-radius: 28px;
     min-height: 330px;
     position: relative;
@@ -273,10 +273,10 @@ h3 {
 }
 .card p {
     font-size: 14px;
-    color: #627166;
+    color: #526376;
 }
 .card .num {
-    background: #edf2e5;
+    background: #edf2fb;
     display: inline-block;
     padding: 5px 10px;
     border-radius: 9px;
@@ -294,7 +294,7 @@ h3 {
 .progress-track {
     height: 6px;
     border-radius: 8px;
-    background: #e1e7d8;
+    background: #dce5f3;
     overflow: hidden;
     margin: 14px 0;
 }
@@ -322,7 +322,7 @@ h3 {
 .chip {
     padding: 5px 10px;
     border-radius: 8px;
-    background: #edf1e6;
+    background: #edf2fb;
     font-size: 13px;
 }
 .options {
@@ -344,7 +344,7 @@ h3 {
 }
 .feedback {
     padding: 16px;
-    background: #f0f4e8;
+    background: #f1eef9;
     border-radius: 10px;
     margin-top: 16px;
 }
@@ -813,7 +813,7 @@ dialog {
 .video-frame {
     width: 100%;
     aspect-ratio: 16 / 9;
-    background: #182a23;
+    background: #18324b;
     border-radius: 14px;
     overflow: hidden;
     margin: 18px 0;
@@ -894,7 +894,7 @@ header > div {
     margin-top: 20px;
     border: 1px solid #d7dfcf;
     border-radius: 12px;
-    background: #eef3e7;
+    background: #edf2fb;
 }
 .study-support label {
     margin: 0;
@@ -977,4 +977,79 @@ header > div {
 .settings-form #settingsStatus {
     margin: 0;
     font-weight: 700;
+}
+
+/* Identidad visual: ilustración estática y colores reservados para orientar. */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+    font-size: 20px;
+}
+.brand-mark {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+.welcome-heading {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin-bottom: 24px;
+}
+.welcome-logo {
+    width: min(32vw, 260px);
+    height: auto;
+    flex-shrink: 0;
+}
+.hero-art .identity-image {
+    width: 88%;
+    height: auto;
+    max-height: 350px;
+    object-fit: contain;
+}
+.hero-art {
+    background: #eee8fa;
+}
+.grade-card:nth-child(2) {
+    border-top: 4px solid #276749;
+}
+.grade-card:first-child {
+    border-top: 4px solid #2457a7;
+}
+.badge {
+    color: #18324b;
+}
+@media (max-width: 650px) {
+    .welcome-heading {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .welcome-logo {
+        width: 180px;
+        align-self: center;
+    }
+    .brand-mark {
+        width: 54px;
+        height: 54px;
+    }
+}
+
+.extra-video {
+    margin-top: 24px;
+    border: 1px solid #c9d5e8;
+    border-radius: 14px;
+    padding: 16px;
+    background: #f6f4fb;
+}
+.extra-video summary {
+    cursor: pointer;
+    font-weight: 700;
+    min-height: 44px;
+}
+.video-resource {
+    margin-top: 16px;
 }

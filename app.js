@@ -68,8 +68,7 @@ function migratePreviousProgress() {
 function gradeScreen() {
     main.innerHTML = `
         <section class="grade-welcome">
-            <span class="badge">BIENVENIDO A INGLES A MI RITMO</span>
-            <h1>Tu aprendizaje empieza<br><em>por tu camino.</em></h1>
+            <div class="welcome-heading"><img class="welcome-logo" src="assets/logo-ingles-mi-ritmo.png" alt="Inglés a mi ritmo: un lápiz con audífonos, un libro y un globo" /><div><span class="badge">BIENVENIDO A INGLÉS A MI RITMO</span><h1>Tu aprendizaje empieza<br><em>por tu camino.</em></h1></div></div>
             <p class="lead">Elige tu grado y luego tu periodo. Cada periodo contiene tres temas con lectura, video, práctica y escritura.</p>
             <div class="grade-grid">
                 <article class="card grade-card">
@@ -215,24 +214,8 @@ ${supportResumeButton()}
 <strong>${grade}.º · ${courses[grade].name}</strong>Tu recorrido</span>
 </div>
 </div>
-<div class="hero-art" aria-label="Ilustración de un cuaderno, un lápiz y una tarjeta con un saludo" role="img">
-<svg viewBox="0 0 420 320" aria-hidden="true">
-<circle cx="230" cy="150" r="125" fill="#d2dfbb"/>
-<g transform="rotate(-10 190 180)">
-<rect x="94" y="53" width="196" height="239" rx="15" fill="#275541"/>
-<rect x="112" y="53" width="178" height="230" rx="12" fill="#fafbf4"/>
-<path d="M135 110h130M135 138h130M135 166h95M135 224h120" stroke="#d2ddc6" stroke-width="5"/>
-<path d="M102 72v195" stroke="#a9c28c" stroke-width="5"/>
-<text x="137" y="204" fill="#315c45" font-size="25" font-family="Georgia">My school life</text>
-</g>
-<g transform="rotate(15 300 230)">
-<rect x="310" y="143" width="17" height="131" rx="4" fill="#d7a365"/>
-<path d="M310 274l8 20 9-20" fill="#f4dbb9"/>
-<path d="M315 286l3 8 4-8" fill="#294d3c"/>
-</g>
-<rect x="249" y="35" width="124" height="67" rx="16" fill="#fff"/>
-<text x="268" y="76" font-family="system-ui" font-weight="700" font-size="25" fill="#315c45">Hello! ✦</text>
-</svg>
+<div class="hero-art">
+<img class="identity-image" src="assets/logo-ingles-mi-ritmo.png" alt="Inglés a mi ritmo, aprende con nuestro lápiz con audífonos" />
 <span class="art-label">Una idea nueva. Un paso más.</span>
 </div>
 </div>
@@ -324,6 +307,26 @@ function pauseVideos() {
         );
     });
 }
+// Cada recurso muestra su propósito, el tiempo del fragmento y su autor.
+function videoResourceMarkup(video) {
+    const start = video.start || 0;
+    const end = video.end || 120;
+    const clock = (seconds) =>
+        Math.floor(seconds / 60) + ":" + String(seconds % 60).padStart(2, "0");
+    const watch =
+        "https://www.youtube.com/watch?v=" + video.id + "&t=" + start + "s";
+    return `<article class="video-resource">
+        <h2>${esc(video.title)}</h2>
+        <p>${esc(video.focus)}</p>
+        <p class="notice"><strong>Para esta temática:</strong> ${esc(video.reason || "Repasa con el ejemplo escrito.")}</p>
+        <p class="chip">${esc(video.level || "Apoyo acompañado")}${video.externalOnly ? "" : ` · Tramo propuesto ${clock(start)}–${clock(end)} (${end - start} segundos). Puedes parar antes.`}</p>
+        ${video.externalOnly ? "" : `<div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/${video.id}?rel=0&playsinline=1&enablejsapi=1&cc_load_policy=1&start=${start}&end=${end}" title="${esc(video.title)} · ${esc(video.author)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`}
+        <p class="notice">Autor: ${esc(video.author)}. Requiere internet. Puedes activar los subtítulos disponibles y pausar. Las actividades se pueden realizar con los ejemplos escritos aunque no cargue el video.</p>
+        <a href="${watch}" target="_blank" rel="noopener">Abrir video en YouTube ↗</a>
+        ${video.source && !video.source.includes("youtube.com") ? `<p><a href="${video.source}" target="_blank" rel="noopener">Recurso y materiales del autor ↗</a></p>` : ""}
+    </article>`;
+}
+
 // Muestra el ejemplo, los apoyos y la práctica de una misión.
 function lesson(i) {
     let l = lessons[i];
@@ -353,16 +356,10 @@ ${["1 · Aprendo", "2 · Veo", "3 · Practico", "4 · Escribo"].map((name, n) =>
 </section>
 <section class="panel video-panel" data-stage="1" hidden>
 <p class="eyebrow">2 · MIRA, PAUSA Y DESCUBRE</p>
-<h2>${video.title}</h2>
-<p>${video.focus}</p>
-<p class="notice"><strong>Apoyo:</strong> ${video.reason || "Repasa con ayuda del ejemplo escrito."}</p>
-<p class="chip">${video.level || "Apoyo acompañado"} · Fragmento recomendado: ${video.end || 120} segundos como máximo. Puedes parar antes.</p>
-<div class="video-frame">
-<iframe src="https://www.youtube-nocookie.com/embed/${video.id}?rel=0&playsinline=1&enablejsapi=1&cc_load_policy=1&start=${video.start || 0}&end=${video.end || 120}" title="${video.title} · ${video.author}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
-</div>
-<p class="notice">Autor: ${video.author}. Requiere internet. Puedes activar subtítulos si el autor los ofrece y pausar cuando lo necesites. Si el reproductor no carga, utiliza el enlace externo; las actividades también funcionan sin el video.</p>
-<a href="https://www.youtube.com/watch?v=${video.id}" target="_blank" rel="noopener">Ver en YouTube ↗</a>
-${video.source ? `<p><a href="${video.source}" target="_blank" rel="noopener">Transcripción y recurso del autor ↗</a></p>` : ""}
+<p>Un video principal para esta temática. Los complementos, cuando aparecen, son opcionales.</p>
+${videoResourceMarkup(video)}
+${(l.extraVideos || []).map((key) => `<details class="extra-video" ontoggle="if (!this.open) pauseVideos()"><summary>Otro recurso opcional: ${esc(videos[key].title)}</summary>${videoResourceMarkup(videos[key])}</details>`).join("")}
+
 </section>
 <section class="panel" data-stage="2" hidden>
 <p class="eyebrow">3 · PONLO EN PRÁCTICA</p>
@@ -612,7 +609,7 @@ function guide() {
             <p>El OVA cuenta tiempo con una temática abierta y la pestaña visible, sin mostrar el reloj. A los diez minutos ofrece una pausa que se puede aceptar, posponer dos minutos o descartar. No mide la atención, no diagnostica cansancio y diez minutos no es un límite universal. Las pausas y las pestañas ocultas no acumulan tiempo; los saltos largos del reloj por suspensión del equipo se descartan. El recordatorio puede desactivarse en la temática.</p>
             <p>Se ofrecen actividades opcionales de descanso, compatibles con permanecer sentado. El estudiante puede volver sin perder el borrador. Se recuerda el último tema y paso por grado; el botón Retomar facilita continuar. La velocidad de la voz puede ajustarse y la orientación contextual explica cómo empezar cada paso. Todo se guarda en el navegador, sin sincronización entre dispositivos.</p>
             <h3>Videos y accesibilidad</h3>
-            <p>Los videos de terceros se integran con YouTube, sin reproducción automática, y pueden incluir publicidad o dejar de estar disponibles. Usa los enlaces externos si se bloquea la inserción. Las lecciones extensas se proponen por fragmentos; el video ambiental de British Council es un reto acompañado y tiene enlace a su transcripción. Los textos propios del OVA permiten realizar todas las prácticas aunque no haya acceso a los videos.</p>
+            <p>Cada una de las 24 temáticas tiene un video principal diferente, seleccionado por su relación con el objetivo. Algunos complementos se ofrecen de forma opcional y pueden requerir acompañamiento por su dificultad. El formato entretenido no garantiza beneficios para todos los estudiantes con TDAH. Los videos de terceros se integran con YouTube, sin reproducción automática, y pueden incluir publicidad o dejar de estar disponibles. Usa los enlaces externos si se bloquea la inserción. Las lecciones extensas se proponen por fragmentos; el video ambiental de British Council es un reto acompañado y tiene enlace a su transcripción. Los textos propios del OVA permiten realizar todas las prácticas aunque no haya acceso a los videos.</p>
             <h3>Privacidad y apoyos</h3>
             <p>El recurso no solicita diagnósticos, nombres ni micrófono. No incluyas información sensible en los borradores. La voz depende del navegador y algunas voces pueden usar servicios del proveedor. YouTube necesita conexión y está sujeto a sus propias condiciones. Usa Aa para ampliar el texto y Pausa para descansar; también puedes navegar con teclado.</p>
             <h3>Créditos</h3>
