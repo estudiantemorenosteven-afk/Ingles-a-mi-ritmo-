@@ -68,7 +68,7 @@ function migratePreviousProgress() {
 function gradeScreen() {
     main.innerHTML = `
         <section class="grade-welcome">
-            <div class="welcome-heading"><img class="welcome-logo" src="assets/logo-ingles-mi-ritmo.png" alt="Inglés a mi ritmo: un lápiz con audífonos, un libro y un globo" /><div><span class="badge">BIENVENIDO A INGLÉS A MI RITMO</span><h1>Tu aprendizaje empieza<br><em>por tu camino.</em></h1></div></div>
+            <div class="welcome-heading"><img class="welcome-logo" src="logo-ingles-mi-ritmo.png" alt="Inglés a mi ritmo: un lápiz con audífonos, un libro y un globo" /><div><span class="badge">BIENVENIDO A INGLÉS A MI RITMO</span><h1>Tu aprendizaje empieza<br><em>por tu camino.</em></h1></div></div>
             <p class="lead">Elige tu grado y luego tu periodo. Cada periodo contiene tres temas con lectura, video, práctica y escritura.</p>
             <div class="grade-grid">
                 <article class="card grade-card">
@@ -215,7 +215,7 @@ ${supportResumeButton()}
 </div>
 </div>
 <div class="hero-art">
-<img class="identity-image" src="assets/logo-ingles-mi-ritmo.png" alt="Inglés a mi ritmo, aprende con nuestro lápiz con audífonos" />
+<img class="identity-image" src="logo-ingles-mi-ritmo.png" alt="Inglés a mi ritmo, aprende con nuestro lápiz con audífonos" />
 <span class="art-label">Una idea nueva. Un paso más.</span>
 </div>
 </div>
