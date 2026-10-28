@@ -11,6 +11,8 @@
         <title>Ingles a mi ritmo · OVA</title>
         <link rel="stylesheet" href="styles.css" />
         <script src="contenido.js" defer></script>
+        <script src="periodos.js" defer></script>
+        <script src="apoyos.js" defer></script>
         <script src="app.js" defer></script>
     </head>
     <body>
@@ -50,14 +52,43 @@
             </footer>
         </div>
         <!-- Ventana de descanso. -->
-        <dialog id="pauseDialog">
+        <dialog
+            id="pauseDialog"
+            aria-labelledby="pauseTitle"
+            aria-describedby="pauseMessage"
+        >
             <p class="eyebrow">UN MOMENTO PARA TI</p>
-            <h2>Haz una pausa</h2>
-            <p>
-                Puedes estirarte, descansar la mirada o respirar a tu ritmo. Vuelve
-                cuando quieras.
-            </p>
-            <button id="resume" class="primary">Continuar aprendiendo</button>
+            <h2 id="pauseTitle">Tu pausa, a tu ritmo</h2>
+            <p id="pauseMessage">Puedes descansar y volver cuando quieras.</p>
+            <div id="pauseActivities" hidden>
+                <p>Elige una sola actividad; no tienes que hacerlas todas:</p>
+                <ul>
+                    <li>
+                        <strong>Descansa la mirada:</strong> mira un objeto alejado
+                        de la pantalla durante un momento.
+                    </li>
+                    <li>
+                        <strong>Cambia de postura:</strong> acomódate o mueve
+                        suavemente las manos y los hombros, dentro de lo que te
+                        resulte cómodo.
+                    </li>
+                    <li>
+                        <strong>Muévete si puedes:</strong> levántate o camina unos
+                        pasos en un lugar seguro, si el contexto lo permite.
+                    </li>
+                </ul>
+                <p class="notice">
+                    También puedes descansar sentado. No fuerces movimientos ni
+                    continúes si algo te incomoda.
+                </p>
+            </div>
+            <div class="actions">
+                <button id="startActivePause" class="primary">
+                    Hacer una pausa
+                </button>
+                <button id="snoozePause">Recordármelo en 2 minutos</button>
+                <button id="resume">Seguir estudiando</button>
+            </div>
         </dialog>
     </body>
 </html>
