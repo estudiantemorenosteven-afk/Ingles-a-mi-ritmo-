@@ -846,3 +846,135 @@ header > div {
         font-size: 36px;
     }
 }
+
+/* Periodos y recorrido por pasos: solo una tarea visible cada vez. */
+.period-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+}
+.period-card ul {
+    padding-left: 20px;
+    font-size: 14px;
+}
+.stage-navigation {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 25px;
+}
+.stage-navigation button[aria-pressed="true"] {
+    background: var(--green);
+    border-color: var(--green);
+    color: white;
+}
+.stage-next {
+    margin-top: 24px;
+}
+[hidden] {
+    display: none !important;
+}
+@media (max-width: 650px) {
+    .period-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .stage-navigation {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Ayudas voluntarias: no muestran el cronómetro ni cambian la calificación. */
+.study-support {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    margin-top: 20px;
+    border: 1px solid #d7dfcf;
+    border-radius: 12px;
+    background: #eef3e7;
+}
+.study-support label {
+    margin: 0;
+    font-size: 14px;
+}
+.study-support select {
+    display: block;
+    font: inherit;
+    min-height: 44px;
+    max-width: 100%;
+    padding: 8px;
+    background: white;
+    color: var(--ink);
+    border: 1px solid #b5c4ac;
+    border-radius: 8px;
+}
+.reminder-choice {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    cursor: pointer;
+}
+.reminder-choice input {
+    width: 21px;
+    height: 21px;
+    flex-shrink: 0;
+}
+#pauseDialog ul {
+    padding-left: 22px;
+}
+#pauseDialog li {
+    margin: 12px 0;
+}
+#pauseDialog .actions {
+    flex-direction: column;
+    align-items: stretch;
+}
+@media (max-width: 650px) {
+    .study-support {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .study-support select {
+        width: 100%;
+        font-size: 16px;
+    }
+}
+
+.settings-form {
+    max-width: 720px;
+    display: grid;
+    gap: 20px;
+}
+.settings-form label {
+    display: block;
+    font-weight: 700;
+}
+.settings-form .reminder-choice {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+}
+.settings-form input[type="number"] {
+    display: block;
+    width: 140px;
+    max-width: 100%;
+    min-height: 44px;
+    margin-top: 8px;
+    padding: 10px;
+    font: inherit;
+    border: 1px solid #66786b;
+    border-radius: 8px;
+}
+.settings-form input:disabled {
+    background: #eee;
+    color: #555;
+}
+.settings-form #settingsStatus {
+    margin: 0;
+    font-weight: 700;
+}

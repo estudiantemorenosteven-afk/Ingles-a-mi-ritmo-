@@ -15,7 +15,7 @@ function emptyState() {
 }
 // Cada grado tiene su propia clave: los resultados no se mezclan.
 function storageKey() {
-    return "ingles-ritmo-v2-grado-" + grade;
+    return "ingles-ritmo-v3-grado-" + grade;
 }
 function save() {
     if (!grade) return;
@@ -28,6 +28,7 @@ function save() {
     }
 }
 function selectGrade(number) {
+    supportStop();
     if (number !== 6 && number !== 7) return;
     if (grade) save();
     grade = number;
@@ -36,32 +37,52 @@ function selectGrade(number) {
     finalQuestions = assessments[grade];
     state = emptyState();
     try {
-        state = {
-            ...state,
-            ...JSON.parse(localStorage.getItem(storageKey()) || "{}"),
-        };
+        const current = localStorage.getItem(storageKey());
+        if (current) {
+            state = { ...state, ...JSON.parse(current) };
+        } else {
+            migratePreviousProgress();
+        }
     } catch {}
     location.hash = "inicio";
     render();
+}
+// Los cuatro temas anteriores ahora son el primer tema de cada periodo.
+function migratePreviousProgress() {
+    const old = JSON.parse(
+        localStorage.getItem("ingles-ritmo-v2-grado-" + grade) || "null",
+    );
+    if (!old) return;
+    state.large = Boolean(old.large);
+    const map = [0, 3, 6, 9];
+    for (let i = 0; i < map.length; i++) {
+        if ((old.done || []).includes(i)) state.done.push(map[i]);
+        if (old.drafts && old.drafts[i]) state.drafts[map[i]] = old.drafts[i];
+        if (old.results && old.results["practice" + i]) {
+            state.results["practice" + map[i]] = old.results["practice" + i];
+        }
+    }
+    state.draft = Object.values(state.drafts).join("\n\n");
+    save();
 }
 function gradeScreen() {
     main.innerHTML = `
         <section class="grade-welcome">
             <span class="badge">BIENVENIDO A INGLES A MI RITMO</span>
             <h1>Tu aprendizaje empieza<br><em>por tu camino.</em></h1>
-            <p class="lead">Elige el grado en el que estudias. Encontrarás temáticas, videos y actividades para tu recorrido.</p>
+            <p class="lead">Elige tu grado y luego tu periodo. Cada periodo contiene tres temas con lectura, video, práctica y escritura.</p>
             <div class="grade-grid">
                 <article class="card grade-card">
                     <span class="grade-number">6.º</span>
                     <h2>Sexto</h2>
-                    <p>Me conozco y descubro mi entorno.</p>
+                    <p>4 periodos · 12 temas</p>
                     <ul><li>Identidad y aula</li><li>Rutinas de cuidado</li><li>Ahorro de energía</li><li>Identidad colombiana</li></ul>
                     <button class="primary" onclick="selectGrade(6)">Entrar a sexto →</button>
                 </article>
                 <article class="card grade-card">
                     <span class="grade-number">7.º</span>
                     <h2>Séptimo</h2>
-                    <p>Me cuido, convivo y participo.</p>
+                    <p>4 periodos · 12 temas</p>
                     <ul><li>Cuidado integral</li><li>Convivencia e inclusión</li><li>Conservación ambiental</li><li>Culturas internacionales</li></ul>
                     <button class="primary" onclick="selectGrade(7)">Entrar a séptimo →</button>
                 </article>
@@ -95,7 +116,7 @@ function speech(text) {
     speechSynthesis.cancel();
     let u = new SpeechSynthesisUtterance(text);
     u.lang = "en-US";
-    u.rate = 0.82;
+    u.rate = supportSettings().rate;
     u.onerror = () => {
         document
             .getElementById("audioStatus")
@@ -121,13 +142,15 @@ function mark(i) {
 const links = [
     ["inicio", "Mi recorrido"],
     ["diagnostico", "Punto de partida"],
-    ["mision-0", "Temáticas"],
+    ["periodos", "Periodos y temas"],
     ["reto", "Reto final"],
     ["progreso", "Mi progreso"],
     ["guia", "Guía y estándares"],
+    ["configuracion", "Configuración"],
 ];
 // Revisa la sección elegida y muestra su contenido en la pantalla.
 function render() {
+    supportStop();
     if ("speechSynthesis" in window) speechSynthesis.cancel();
     session = null;
     let r = location.hash.slice(1) || "inicio";
@@ -148,11 +171,14 @@ function render() {
             (
                 [id, t],
                 i,
-            ) => `<a href="#${id}" class="${r === id || (id === "mision-0" && r.startsWith("mision")) ? "active" : ""}">
+            ) => `<a href="#${id}" class="${r === id || (id === "periodos" && (r.startsWith("mision") || r.startsWith("periodo"))) ? "active" : ""}">
 <b>0${i + 1}</b>${t}</a>`,
         )
         .join("");
-    if (r === "inicio") home();
+    if (r === "inicio" || r === "periodos") home();
+    else if (r.startsWith("periodo-")) periodPage(Number(r.split("-")[1]));
+    else if (r.startsWith("cierre-")) periodQuiz(Number(r.split("-")[1]));
+    else if (r === "configuracion") supportConfiguration();
     else if (r === "guia") guide();
     else if (r === "progreso") progress();
     else if (r.startsWith("mision-"))
@@ -165,7 +191,7 @@ function render() {
     main.focus();
     window.scrollTo(0, 0);
 }
-// Dibuja la página de inicio y las tarjetas de las tres misiones.
+// Dibuja la página de inicio y las tarjetas de los cuatro periodos.
 function home() {
     let pct = Math.round((state.done.length / lessons.length) * 100);
     main.innerHTML = `<div class="hero">
@@ -176,12 +202,13 @@ function home() {
 </h1>
 <p class="lead">${courses[grade].subtitle}. Explora los temas y expresa tus ideas, un paso a la vez.</p>
 <div class="actions">
-<button class="primary" onclick="go('diagnostico')">Comenzar mi recorrido ↗</button>
+<button class="primary" onclick="go('periodo-1')">Explorar primer periodo ↗</button>
 <button onclick="go('guia')">Cómo funciona</button>
+${supportResumeButton()}
 </div>
 <div class="stats">
 <span>
-<strong>${lessons.length} temáticas</strong>Pasos pequeños</span>
+<strong>4 periodos · ${lessons.length} temas</strong>Pasos pequeños</span>
 <span>
 <strong>Sin cronómetro</strong>Tú marcas el ritmo</span>
 <span>
@@ -217,27 +244,100 @@ function home() {
 <div style="width:${pct}%">
 </div>
 </div>
-<div class="grid">${lessons
-        .map(
-            (l, i) => `<article class="card">
-<span class="num">${state.done.includes(i) ? "✓ COMPLETADA" : "0" + (i + 1)}</span>
-<p class="eyebrow">${l.tag}</p>
-<h3>${l.title}</h3>
-<p>${l.desc}</p>
-<button onclick="go('mision-${i}')">${state.done.includes(i) ? "Volver a practicar" : "Explorar temática"} →</button>
-</article>`,
-        )
+<div class="period-grid">${courses[grade].periods
+        .map((period, i) => {
+            const complete = period.topics.filter((topic) =>
+                state.done.includes(topic.id),
+            ).length;
+            return `<article class="card period-card">
+        <span class="num">PERIODO ${i + 1}</span>
+        <h3>${period.name}</h3>
+        <p>${period.axis}</p>
+        <ul>${period.topics.map((topic) => `<li>${topic.title}</li>`).join("")}</ul>
+        <p class="notice">${complete} de 3 prácticas completadas</p>
+        <button onclick="go('periodo-${i + 1}')">Abrir periodo ${i + 1} →</button>
+    </article>`;
+        })
         .join("")}</div>
+<p class="notice">Esta es una propuesta de cuatro periodos basada en los referentes del MEN. Su orden y alcance deben validarse con el plan de área de tu institución.</p>
 <p class="notice" id="storageNote">El avance se guarda solo en este navegador. No necesitas registrar tu nombre ni diagnóstico.</p>`;
+}
+// Abrir un periodo sin mostrar todos los contenidos del año al mismo tiempo.
+function periodPage(number) {
+    if (![1, 2, 3, 4].includes(number)) return home();
+    const period = courses[grade].periods[number - 1];
+    main.innerHTML = `
+        <span class="badge">GRADO ${grade}.º · PERIODO ${number}</span>
+        <h1>${period.name}</h1>
+        <p class="lead">${period.axis}. Tres temas, a tu ritmo.</p>
+        <div class="grid">${period.topics
+            .map(
+                (topic) => `<article class="card">
+            <span class="num">TEMA ${topic.position} ${state.done.includes(topic.id) ? "· ✓ Práctica realizada" : ""}</span>
+            <h2>${topic.title}</h2><p>${topic.goal}</p>
+            <button onclick="go('mision-${topic.id}')">Comenzar tema ${topic.position} →</button>
+        </article>`,
+            )
+            .join("")}</div>
+        <section class="panel">
+            <h2>Cierre del periodo</h2>
+            <p><strong>Producto sugerido:</strong> ${period.project}</p>
+            <p>Utiliza tus borradores como preparación y presenta el producto a tu docente. Revisión: respuesta a la tarea, claridad del mensaje, vocabulario y conexiones entre ideas.</p>
+            <p>Repaso interactivo: seis preguntas, sin límite de tiempo. ${resultLabel("period" + number)}</p>
+            <button class="primary" onclick="go('cierre-${number}')">Repasar este periodo →</button>
+        </section>
+        <div class="actions"><button onclick="go('inicio')">← Todos los periodos</button>
+        ${number < 4 ? `<button onclick="go('periodo-${number + 1}')">Siguiente periodo →</button>` : ""}</div>`;
+}
+function periodQuiz(number) {
+    if (![1, 2, 3, 4].includes(number)) return home();
+    const questions = [];
+    for (const topic of courses[grade].periods[number - 1].topics) {
+        questions.push(topic.questions[0], topic.questions[2]);
+    }
+    quiz("period" + number, questions);
+}
+// Mostrar solo un paso de la lección. Cambiar de paso no borra las respuestas.
+function showStage(number, moveFocus = true) {
+    supportRecordStage(number);
+    if ("speechSynthesis" in window) speechSynthesis.cancel();
+    const names = ["Aprendo", "Veo", "Practico", "Escribo"];
+    document.querySelectorAll("[data-stage]").forEach((panel) => {
+        panel.hidden = Number(panel.dataset.stage) !== number;
+    });
+    document.querySelectorAll("[data-stage-button]").forEach((button) => {
+        button.setAttribute(
+            "aria-pressed",
+            String(Number(button.dataset.stageButton) === number),
+        );
+    });
+    document.getElementById("stageStatus").textContent =
+        "Paso " + (number + 1) + " de 4 · " + names[number];
+    if (number !== 1) pauseVideos();
+    if (moveFocus) document.getElementById("stageStatus").focus();
+}
+function pauseVideos() {
+    document.querySelectorAll(".video-frame iframe").forEach((frame) => {
+        frame.contentWindow.postMessage(
+            JSON.stringify({ event: "command", func: "pauseVideo", args: [] }),
+            "https://www.youtube-nocookie.com",
+        );
+    });
 }
 // Muestra el ejemplo, los apoyos y la práctica de una misión.
 function lesson(i) {
     let l = lessons[i];
     const video = videos[l.video];
-    main.innerHTML = `<span class="badge">GRADO ${grade}.º · TEMA ${i + 1} DE ${lessons.length} · ${l.tag}</span>
+    main.innerHTML = `<span class="badge">GRADO ${grade}.º · PERIODO ${l.period} · TEMA ${l.position} DE 3 · ${l.tag}</span>
 <h1>${l.title}</h1>
 <p class="lead">${l.goal}</p>
-<section class="panel">
+${supportMarkup(i)}
+<button onclick="go('periodo-${l.period}')">← Temas del periodo ${l.period}</button>
+<div class="stage-navigation" aria-label="Pasos del tema">
+${["1 · Aprendo", "2 · Veo", "3 · Practico", "4 · Escribo"].map((name, n) => `<button data-stage-button="${n}" aria-pressed="${n === 0}" onclick="showStage(${n})">${name}</button>`).join("")}
+</div>
+<p id="stageStatus" class="eyebrow" tabindex="-1" role="status">Paso 1 de 4 · Aprendo</p>
+<section class="panel" data-stage="0">
 <p class="eyebrow">1 · COMPRENDE EL TEMA</p>
 <h2>¿Cómo se usa?</h2>
 <p>${l.explanation}</p>
@@ -251,18 +351,20 @@ function lesson(i) {
 <div class="chips">${l.words.map((w) => `<span class="chip">${w}</span>`).join("")}</div>
 </details>
 </section>
-<section class="panel video-panel">
+<section class="panel video-panel" data-stage="1" hidden>
 <p class="eyebrow">2 · MIRA, PAUSA Y DESCUBRE</p>
 <h2>${video.title}</h2>
 <p>${video.focus}</p>
+<p class="notice"><strong>Apoyo:</strong> ${video.reason || "Repasa con ayuda del ejemplo escrito."}</p>
+<p class="chip">${video.level || "Apoyo acompañado"} · Fragmento recomendado: ${video.end || 120} segundos como máximo. Puedes parar antes.</p>
 <div class="video-frame">
-<iframe src="https://www.youtube-nocookie.com/embed/${video.id}?rel=0&playsinline=1&enablejsapi=1" title="${video.title} · ${video.author}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+<iframe src="https://www.youtube-nocookie.com/embed/${video.id}?rel=0&playsinline=1&enablejsapi=1&cc_load_policy=1&start=${video.start || 0}&end=${video.end || 120}" title="${video.title} · ${video.author}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
 </div>
 <p class="notice">Autor: ${video.author}. Requiere internet. Puedes activar subtítulos si el autor los ofrece y pausar cuando lo necesites. Si el reproductor no carga, utiliza el enlace externo; las actividades también funcionan sin el video.</p>
 <a href="https://www.youtube.com/watch?v=${video.id}" target="_blank" rel="noopener">Ver en YouTube ↗</a>
 ${video.source ? `<p><a href="${video.source}" target="_blank" rel="noopener">Transcripción y recurso del autor ↗</a></p>` : ""}
 </section>
-<section class="panel">
+<section class="panel" data-stage="2" hidden>
 <p class="eyebrow">3 · PONLO EN PRÁCTICA</p>
 <h2>¿Qué comprendiste?</h2>
 <p>Puedes consultar el ejemplo y volver a intentarlo. Las pistas te ayudan a aprender.</p>
@@ -270,7 +372,7 @@ ${video.source ? `<p><a href="${video.source}" target="_blank" rel="noopener">Tr
 <div id="practiceArea">
 </div>
 </section>
-<section class="panel">
+<section class="panel" data-stage="3" hidden>
 <p class="eyebrow">4 · TU VOZ, TUS IDEAS</p>
 <h2>Tu producción en inglés</h2>
 <p>${l.prompt} Escribe entre tres y cinco oraciones; puedes inventar los datos.</p>
@@ -294,9 +396,20 @@ ${video.source ? `<p><a href="${video.source}" target="_blank" rel="noopener">Tr
 </details>
 </section>
 <div class="actions">
-<button onclick="go('inicio')">← Mi recorrido</button>
+<button onclick="go('periodo-${l.period}')">← Volver al periodo</button>
 <button onclick="go('${i < lessons.length - 1 ? "mision-" + (i + 1) : "reto"}')">${i < lessons.length - 1 ? "Siguiente temática" : "Ir al reto final"} →</button>
 </div>`;
+    // Añadir avance entre pasos sin recargar la temática.
+    const panels = main.querySelectorAll("[data-stage]");
+    panels.forEach((panel, number) => {
+        if (number < 3) {
+            const next = document.createElement("button");
+            next.className = "primary stage-next";
+            next.textContent = "Continuar al paso " + (number + 2) + " →";
+            next.onclick = () => showStage(number + 1);
+            panel.appendChild(next);
+        }
+    });
     document.getElementById("listen").onclick = () => speech(l.text);
     document.getElementById("practice").onclick = () => {
         session = {
@@ -326,12 +439,13 @@ ${video.source ? `<p><a href="${video.source}" target="_blank" rel="noopener">Tr
         document.getElementById("speakDraft").onclick = () =>
             speech(document.getElementById("draft").value);
     }
+    supportStart(i);
 }
 // Prepara el diagnóstico inicial o el reto final.
 function quiz(key, items) {
     main.innerHTML = `<span class="badge">${key === "pre" ? "ANTES DE EMPEZAR" : "CIERRE DE LA UNIDAD"}</span>
-<h1>${key === "pre" ? "Tu punto de partida" : "Mi reto final"}</h1>
-<p class="lead">${key === "pre" ? "Explora lo que ya sabes. No es una calificación." : "Responde sin consultar las misiones. Cada primera respuesta cuenta para este recorrido; al terminar podrás repasar."}</p>
+<h1>${key === "pre" ? "Tu punto de partida" : key.startsWith("period") ? "Repaso del periodo " + key.slice(6) : "Repaso general del grado"}</h1>
+<p class="lead">${key === "pre" ? "Explora lo que ya sabes. No es una calificación." : "Repasa sin consultar los temas. Se retoman preguntas de práctica: este recorrido consolida lo aprendido y no es una prueba independiente. Puedes realizar primero los cierres de cada periodo."}</p>
 <section class="panel" id="quizArea">
 </section>`;
     session = { key, items, index: 0, score: 0, attempts: 0, records: [] };
@@ -431,6 +545,7 @@ function progress() {
 <section class="panel">
 <h2>Mis actividades de entrada y cierre</h2>
 <p>Se conserva el resultado más reciente de cada actividad. Las preguntas son distintas y no constituyen una prueba estandarizada ni una medición causal del impacto.</p>
+<p>Repasos por periodo: ${[1, 2, 3, 4].map((p) => `P${p}: ${resultLabel("period" + p)}`).join(" · ")}</p>
 <p>Entrada: <strong>${resultLabel("pre")}</strong> · Cierre: <strong>${resultLabel("final")}</strong>
 </p>
 <p>Escritura: ${state.draft ? "borrador guardado, pendiente de revisión docente." : "sin borrador guardado."}</p>
@@ -471,7 +586,7 @@ function guide() {
     main.innerHTML = `
         <span class="badge">GUÍA DOCENTE · GRADO ${grade}.º</span>
         <h1>Aprender con propósito</h1>
-        <p class="lead">Dos rutas diferenciadas y cuatro temáticas por grado. La selección es una adaptación didáctica para el OVA, pendiente de validación con el plan de área institucional.</p>
+        <p class="lead">Dos rutas diferenciadas, cuatro periodos por grado y tres temas por periodo (24 temas en total). La selección es una adaptación didáctica para el OVA, pendiente de validación con el plan de área institucional.</p>
         <section class="panel">
             <h2>Referentes del MEN</h2>
             <p>La Guía 22 (2006, páginas impresas 22–23) presenta estándares conjuntos para sexto y séptimo y una meta de referencia A2.2 al finalizar el grupo. Para distribuir temas por grado se toma además el Esquema Curricular Sugerido de Inglés de 2016: sexto, módulos 1–4 (páginas impresas 90–93); séptimo, módulos 1–4 (94–98).</p>
@@ -488,6 +603,14 @@ function guide() {
             <p>Puedes cambiar de grado desde el encabezado. El avance y los borradores se guardan por separado para cada grado en este navegador. Esto no crea perfiles individuales: en equipos compartidos se debe borrar el registro antes de que otra persona use el mismo grado.</p>
             <h3>Evaluación y acompañamiento</h3>
             <p>Las prácticas registran aciertos iniciales y reintentos. El reto final retoma preguntas de las prácticas para consolidar lo aprendido: no es una prueba independiente de transferencia ni una medición causal del impacto. En escritura, revise respuesta a la tarea, claridad, vocabulario y conexión entre ideas. La expresión oral puede practicarse con un compañero o docente; no se graba ni se califica automáticamente.</p>
+            <h3>Cuatro periodos como propuesta institucional</h3>
+            <p>La periodicidad y la distribución exacta las define cada institución en su SIEE y plan de área. No existe una malla nacional única de cuatro periodos. Aquí se usa, por solicitud del proyecto, una adaptación en cuatro periodos de los cuatro ejes modulares sugeridos por el MEN. Cada periodo tiene tres temas y un producto integrador; no equivale a una planeación completa de todas las horas de clase.</p>
+            <h3>Apoyos para la atención y la organización</h3>
+            <p>Se presenta un paso a la vez, con meta visible, ejemplos, pausas voluntarias, reintentos y guardado de borradores. Los fragmentos de video se limitan a unos dos minutos y los subtítulos se solicitan al reproductor si están disponibles. Esta duración es una decisión de diseño ajustable, no una capacidad de atención universal. No hay un video clínicamente validado como el mejor para todos los estudiantes con TDA o TDAH; el docente debe revisar comprensión, carga visual y preferencias de cada estudiante.</p>
+            <p>Orientaciones: <a href="https://udlguidelines.cast.org/" target="_blank" rel="noopener">CAST · Diseño Universal para el Aprendizaje</a>; <a href="https://www.teachingenglish.org.uk/professional-development/teachers/managing-resources/articles/teenagers-and-video" target="_blank" rel="noopener">British Council · uso didáctico de videos con adolescentes</a>.</p>
+            <h3>Recordatorio de pausa y ayudas</h3>
+            <p>El OVA cuenta tiempo con una temática abierta y la pestaña visible, sin mostrar el reloj. A los diez minutos ofrece una pausa que se puede aceptar, posponer dos minutos o descartar. No mide la atención, no diagnostica cansancio y diez minutos no es un límite universal. Las pausas y las pestañas ocultas no acumulan tiempo; los saltos largos del reloj por suspensión del equipo se descartan. El recordatorio puede desactivarse en la temática.</p>
+            <p>Se ofrecen actividades opcionales de descanso, compatibles con permanecer sentado. El estudiante puede volver sin perder el borrador. Se recuerda el último tema y paso por grado; el botón Retomar facilita continuar. La velocidad de la voz puede ajustarse y la orientación contextual explica cómo empezar cada paso. Todo se guarda en el navegador, sin sincronización entre dispositivos.</p>
             <h3>Videos y accesibilidad</h3>
             <p>Los videos de terceros se integran con YouTube, sin reproducción automática, y pueden incluir publicidad o dejar de estar disponibles. Usa los enlaces externos si se bloquea la inserción. Las lecciones extensas se proponen por fragmentos; el video ambiental de British Council es un reto acompañado y tiene enlace a su transcripción. Los textos propios del OVA permiten realizar todas las prácticas aunque no haya acceso a los videos.</p>
             <h3>Privacidad y apoyos</h3>
@@ -501,18 +624,13 @@ document.getElementById("size").onclick = () => {
     document.body.classList.toggle("large", state.large);
     save();
 };
-document.getElementById("pause").onclick = () => {
-    if ("speechSynthesis" in window) speechSynthesis.cancel();
-    document.querySelectorAll(".video-frame iframe").forEach((frame) => {
-        frame.contentWindow.postMessage(
-            JSON.stringify({ event: "command", func: "pauseVideo", args: [] }),
-            "https://www.youtube-nocookie.com",
-        );
-    });
-    document.getElementById("pauseDialog").showModal();
-};
-document.getElementById("resume").onclick = () =>
-    document.getElementById("pauseDialog").close();
+document.getElementById("pause").onclick = () => supportShowBreak(true);
+document.getElementById("startActivePause").onclick = supportBeginPause;
+document.getElementById("snoozePause").onclick = () => supportCloseBreak(true);
+document.getElementById("resume").onclick = () => supportCloseBreak(false);
+document
+    .getElementById("pauseDialog")
+    .addEventListener("close", supportResumeAfterClose);
 document.getElementById("gradeSwitch").onclick = () => go("grados");
 window.addEventListener("hashchange", render);
 render();
