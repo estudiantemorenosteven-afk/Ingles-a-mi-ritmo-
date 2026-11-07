@@ -1116,3 +1116,17 @@ header > div {
 #topicStepProgress {margin-top:-8px;margin-bottom:16px}
 #vocabDialog {max-width:470px}
 @media(max-width:600px) {#pauseDialog .actions {display:flex;flex-direction:column;align-items:stretch}.mission-line {padding:12px}.sentence-answer {padding:10px}}
+
+/* Juegos opcionales: una partida visible y controles sin límite de tiempo. */
+.game-choices {display:grid;gap:12px;margin:20px 0}
+.game-choices button {text-align:left;white-space:normal;padding:16px}
+.game-choices span {display:block;font-weight:normal;margin-top:7px;font-size:.95em}
+.pair-columns {display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+.pair-columns h4 {margin:0 0 12px}
+.pair-word {display:block;width:100%;min-height:64px;margin-bottom:12px;white-space:normal;overflow-wrap:anywhere}
+.pair-word[aria-pressed="true"] {outline:3px solid #315f91;outline-offset:2px;background:#edf4f7}
+.pair-word:disabled {opacity:1;background:#edf5ed;color:#285a38;border-color:#7d9e85}
+.activity-back {margin-top:20px}
+#wordGameArea .reading {overflow-wrap:anywhere}
+#wordGameArea button {max-width:100%;white-space:normal}
+@media(max-width:480px){.pair-columns{gap:10px}.pair-word{padding:10px 6px;font-size:.95em}.game-choices button{padding:12px}}

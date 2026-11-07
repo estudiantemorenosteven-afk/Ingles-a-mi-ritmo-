@@ -131,6 +131,7 @@ function render() {
     supportStop();
     stopSpeech(false);
     session = null;
+    wordGame = null;
     let r = location.hash.slice(1) || "inicio";
     const choosing = !grade || r === "grados";
     document.body.classList.toggle("choosing-grade", choosing);
@@ -358,9 +359,10 @@ ${(l.extraVideos || []).map((key) => `<details class="extra-video" ontoggle="if 
 <p class="eyebrow">3 · PONLO EN PRÁCTICA</p>
 <h2>¿Qué comprendiste?</h2>
 <p>Puedes consultar el ejemplo y volver a intentarlo. Las pistas te ayudan a aprender.</p>
-<div id="practiceChoice" class="actions"><button class="primary" id="practice">Responder preguntas</button><button onclick="startTopicPractice(${i}, 'sentences')">Construir frases</button></div>
+<div id="practiceChoice" class="actions"><button class="primary" id="practice">Responder preguntas</button><button onclick="startTopicPractice(${i}, 'sentences')">Construir frases</button><button onclick="openTopicGames(${i})">Juegos de palabras</button></div>
 <div id="practiceArea">
 </div>
+${gamesMarkup(i)}
 </section>
 <section class="panel" data-stage="3" hidden>
 <p class="eyebrow">4 · TU VOZ, TUS IDEAS</p>
@@ -541,7 +543,7 @@ function progress() {
             (l, i) => `<article class="card">
 <span class="num">${state.done.includes(i) ? "✓ Completada" : "Por explorar"}</span>
 <h3>${l.title}</h3>
-<p class="notice">${learningProgressText(i)}</p>
+<p class="notice">${learningProgressText(i)}</p><p class="notice">${gamesProgressText(i)}</p>
 <p>${state.results["practice" + i] ? state.results["practice" + i].score + " aciertos iniciales de " + state.results["practice" + i].total : "Sin práctica registrada."}</p>
 <button onclick="go('mision-${i}')">Practicar →</button>
 </article>`,
@@ -606,6 +608,8 @@ function guide() {
             <h2>Una ruta por pasos</h2>
             <ol><li>Elige sexto o séptimo.</li><li>Resuelve el punto de partida.</li><li>Explora cada tema: explicación, lectura, audio, video y práctica.</li><li>Escribe tu producción y compártela con tu docente.</li><li>Realiza el reto final y descarga tu registro si lo necesitas.</li></ol>
             <p>Puedes cambiar de grado desde el encabezado. El avance y los borradores se guardan por separado para cada grado en este navegador. Esto no crea perfiles individuales: en equipos compartidos se debe borrar el registro antes de que otra persona use el mismo grado.</p>
+            <h3>Juegos por temática</h3>
+            <p>En Practico, Juegos de palabras ofrece parejas inglés–español, completar frases y reconocimiento de vocabulario en contexto. Las partidas utilizan palabras y ejemplos del tema seleccionado, permiten pistas y reintentos y no tienen límite de tiempo ni penalizaciones. La partida se conserva al cambiar de paso o durante una pausa; al salir del tema o recargar, se conserva el registro de juegos terminados, pero se reinicia la partida en curso. Este registro es independiente de las prácticas y no mide atención ni eficacia clínica.</p>
             <h3>Evaluación y acompañamiento</h3>
             <p>Las prácticas registran aciertos iniciales y reintentos. El reto final retoma preguntas de las prácticas para consolidar lo aprendido: no es una prueba independiente de transferencia ni una medición causal del impacto. Los textos de apoyo están disponibles al escribir y en las preguntas vinculadas a cada temática. En escritura, revise respuesta a la tarea, claridad, vocabulario y conexión entre ideas. La expresión oral puede practicarse con un compañero o docente; no se graba ni se califica automáticamente.</p>
             <h3>Cuatro periodos como propuesta institucional</h3>

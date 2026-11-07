@@ -885,6 +885,10 @@ function practiceHint(question) {
 }
 function startTopicPractice(topic, mode) {
     stopSpeech(false);
+    wordGame = null;
+    document.getElementById("gamesPanel").hidden = true;
+    document.getElementById("wordGameArea").innerHTML = "";
+    document.getElementById("changeActivity").hidden = false;
     const lesson = lessons[topic];
     document.getElementById("practiceChoice").hidden = true;
     const items = mode === "sentences" ? learningContent[grade][topic].examples : lesson.questions;
@@ -948,6 +952,7 @@ function resumeAfterPause() {
     const stage = supportSettings().stages[topic] || 0;
     let message = ["Estabas leyendo el ejemplo.","Estabas en el video. Puedes reproducirlo cuando quieras.","Estabas practicando.","Estabas escribiendo. Tu borrador se conserva."][stage];
     if (stage === 2 && session && session.lesson === topic && session.index < session.items.length) message = "Estabas en la actividad " + (session.index+1) + " de " + session.items.length + ". Continúa donde quedaste.";
+    if (stage === 2 && wordGame && wordGame.topic === topic) message = wordGame.complete ? "Terminaste el juego. Puedes elegir otra actividad." : "Estabas en «" + wordGameNames[wordGame.kind] + "». Continúa donde quedaste.";
     const notice = document.getElementById("resumeNotice");
     if (notice) { notice.textContent = message; notice.hidden = false; }
 }
