@@ -1053,3 +1053,66 @@ header > div {
 .video-resource {
     margin-top: 16px;
 }
+
+/* Texto de referencia visible al escribir y responder preguntas. */
+.reference-context {
+    background: #f1f5fb;
+    border-left: 4px solid #2457a7;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0 28px;
+}
+.reference-context h3 {
+    margin-top: 0;
+    font-size: 18px;
+}
+.reference-context .reading {
+    font-size: 18px;
+    line-height: 1.7;
+}
+.audio-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 12px 0;
+}
+.voice-settings label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.voice-settings select {
+    width: 100%;
+    max-width: 620px;
+    min-height: 44px;
+    padding: 10px;
+    font: inherit;
+    color: var(--ink);
+    background: white;
+    border: 1px solid #64748b;
+    border-radius: 10px;
+}
+@media (max-width: 650px) {
+    .reference-context {
+        padding: 16px;
+    }
+    .audio-actions button {
+        max-width: 100%;
+    }
+}
+
+/* Ayudas breves: los detalles aparecen solo cuando se solicitan. */
+.mission-line {padding:14px 18px;background:#edf4f7;border-radius:12px;max-width:78ch;line-height:1.6}
+.vocab-word {display:inline;min-height:0;padding:0 2px;border:0;border-bottom:2px dotted #366477;border-radius:0;background:transparent;color:#244e64;font:inherit;line-height:inherit;white-space:normal}
+.vocab-word:hover {background:#e6f0f2}
+.interest-panel {margin-top:22px}
+.interest-panel select, #pauseActivity {display:block;width:100%;max-width:420px;margin:12px 0;min-height:44px}
+.interest-panel label {display:block;margin-top:16px}
+.sentence-answer {min-height:90px;padding:16px;border:1px dashed #7797a4;border-radius:12px;background:#f4f8fa;margin:18px 0;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.sentence-tokens {display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.sentence-answer button,.sentence-tokens button {white-space:normal;max-width:100%;text-align:left}
+.pause-instruction {padding:16px;background:#edf4f7;border-radius:12px;line-height:1.7}
+.resume-notice {padding:12px 16px;background:#edf4f7;border-radius:10px}
+#topicStepProgress {margin-top:-8px;margin-bottom:16px}
+#vocabDialog {max-width:470px}
+@media(max-width:600px) {#pauseDialog .actions {display:flex;flex-direction:column;align-items:stretch}.mission-line {padding:12px}.sentence-answer {padding:10px}}

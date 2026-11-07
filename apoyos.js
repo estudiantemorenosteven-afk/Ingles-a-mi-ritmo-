@@ -13,7 +13,11 @@ function supportSettings() {
     if (!settings.elapsed) settings.elapsed = {};
     if (!settings.stages) settings.stages = {};
     if (typeof settings.reminders !== "boolean") settings.reminders = true;
-    if (!settings.rate) settings.rate = 0.82;
+    if (!settings.audioVersion) {
+        if (!settings.rate || settings.rate === 0.82) settings.rate = 0.95;
+        settings.audioVersion = 1;
+    }
+    if (![0.65, 0.82, 0.95, 1].includes(settings.rate)) settings.rate = 0.95;
     if (
         !Number.isInteger(settings.minutes) ||
         settings.minutes < 1 ||
@@ -32,6 +36,7 @@ function supportMarkup(topic) {
                 <select id="audioSpeed" onchange="supportSetRate(this.value)">
                     <option value="0.65" ${settings.rate === 0.65 ? "selected" : ""}>Más despacio</option>
                     <option value="0.82" ${settings.rate === 0.82 ? "selected" : ""}>Pausado</option>
+                    <option value="0.95" ${settings.rate === 0.95 ? "selected" : ""}>Recomendada</option>
                     <option value="1" ${settings.rate === 1 ? "selected" : ""}>Normal</option>
                 </select>
             </label>
@@ -40,15 +45,15 @@ function supportMarkup(topic) {
                 Recordatorios de pausa (${settings.minutes} min)
             </label>
         </div>
-        <p class="notice">Puedes hacer una pausa cuando quieras. El recordatorio cuenta tiempo con esta temática abierta y la pestaña visible; no mide tu atención. Puedes cambiar el intervalo o desactivar los avisos en Configuración. <a href="#configuracion">Abrir Configuración</a>.</p>
+        <p class="notice">Pausas a tu ritmo. <a href="#configuracion">Cambiar los recordatorios</a>.</p>
         <div id="studyHelp" class="feedback" role="status" hidden></div>`;
 }
 
 function supportSetRate(value) {
     const rate = Number(value);
-    if (![0.65, 0.82, 1].includes(rate)) return;
+    if (![0.65, 0.82, 0.95, 1].includes(rate)) return;
     supportSettings().rate = rate;
-    if ("speechSynthesis" in window) speechSynthesis.cancel();
+    stopSpeech(false);
     save();
 }
 
@@ -125,38 +130,33 @@ function supportTick(now = Date.now(), allowReminder = true) {
     }
 }
 
-function supportShowBreak(manual = false) {
-    if ("speechSynthesis" in window) speechSynthesis.cancel();
+function pauseActivityChanged(value) {
+    const number = Number(value);
+    if (![0, 1, 2].includes(number)) return;
+    document.getElementById("pauseActivityInstruction").textContent = [
+        "Mira un objeto alejado de la pantalla durante un momento.",
+        "Acomódate o mueve suavemente las manos y los hombros.",
+        "Si puedes y el lugar es seguro, levántate o camina unos pasos."
+    ][number];
+    if (grade) { supportSettings().breakActivity = number; save(); }
+}
+function supportShowBreak() {
+    stopSpeech(false);
     pauseVideos();
+    const vocabulary = document.getElementById("vocabDialog");
+    if (vocabulary.open) vocabulary.close();
     const dialog = document.getElementById("pauseDialog");
-    document.getElementById("pauseTitle").textContent = manual
-        ? "Tu pausa, a tu ritmo"
-        : "¿Hacemos una pausa?";
-    document.getElementById("pauseMessage").textContent = manual
-        ? "Descansa si lo necesitas. No hay una duración obligatoria y puedes volver cuando quieras."
-        : `Has acumulado ${supportSettings().minutes} minutos con esta temática abierta y la pestaña visible desde el último recordatorio. Puedes hacer una pausa breve o continuar. Tu borrador se conserva.`;
-    document.getElementById("pauseActivities").hidden = !manual;
-    document.getElementById("startActivePause").hidden = manual;
-    document.getElementById("snoozePause").hidden = manual;
-    document.getElementById("resume").textContent = manual
-        ? "Volver a mi actividad"
-        : "Seguir estudiando";
+    const chosen = grade ? supportSettings().breakActivity || 0 : 0;
+    document.getElementById("pauseActivity").value = chosen;
+    pauseActivityChanged(chosen);
+    document.getElementById("snoozePause").disabled = !grade || activeSupportTopic === null || !supportSettings().reminders;
+    nextElapsedAfterClose = 0;
     if (!dialog.open) dialog.showModal();
     supportLastTick = Date.now();
 }
 
-function supportBeginPause() {
-    document.getElementById("pauseTitle").textContent = "Un momento para ti";
-    document.getElementById("pauseActivities").hidden = false;
-    document.getElementById("pauseMessage").textContent =
-        "Escoge una opción cómoda para ti. Puedes hacerla sentado o de pie y terminar cuando quieras.";
-    document.getElementById("startActivePause").hidden = true;
-    document.getElementById("snoozePause").hidden = true;
-    document.getElementById("resume").textContent = "Volver a mi actividad";
-}
-
 function supportCloseBreak(snooze = false) {
-    nextElapsedAfterClose = snooze
+    nextElapsedAfterClose = snooze && grade && activeSupportTopic !== null && supportSettings().reminders
         ? supportSettings().minutes * 60 * 1000 - 2 * 60 * 1000
         : 0;
     document.getElementById("pauseDialog").close();
@@ -169,6 +169,7 @@ function supportResumeAfterClose() {
     }
     nextElapsedAfterClose = 0;
     supportLastTick = Date.now();
+    resumeAfterPause();
 }
 
 function supportResumeButton() {
@@ -216,7 +217,17 @@ function supportConfiguration() {
             </div>
             <p id="settingsStatus" role="status" aria-live="polite"></p>
         </form>
+        <section class="panel voice-settings">
+            <h2>Voz de lectura</h2>
+            <label for="readingVoice">Voz en inglés</label>
+            <select id="readingVoice" onchange="selectReadingVoice(this.value)"><option>Cargando voces…</option></select>
+            <p id="voiceAvailability" class="notice" role="status"></p>
+            <div class="audio-actions"><button onclick="speech('Hello! We can learn English together, one step at a time.', 'voicePreviewStatus')">Probar voz</button><button data-audio-stop hidden onclick="stopSpeech()">Detener audio</button></div>
+            <p id="voicePreviewStatus" role="status"></p>
+            <details><summary>Cómo mejorar la pronunciación</summary><p>La selección automática prioriza voces inglesas identificadas como naturales y voces de Google cuando están disponibles. Puedes escoger y probar otra. La calidad depende del equipo; algunas voces requieren internet. Este lector no es el servicio de Google Traductor.</p><p>La velocidad se ajusta en las ayudas de cada tema. La voz lee el texto escrito y no corrige automáticamente las respuestas.</p></details>
+        </section>
         <p class="notice">Los ajustes se guardan para el grado seleccionado en este navegador y dispositivo. No se sincronizan con otros equipos. Cambiar el intervalo reinicia el tiempo acumulado; conserva tu progreso y tus borradores. El reloj cuenta tiempo con una temática abierta y la pestaña visible; no mide atención.</p>`;
+    refreshVoiceControls();
 }
 
 function supportToggleSettings(enabled) {
